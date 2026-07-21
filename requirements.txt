@@ -17,7 +17,7 @@ opencv-python-headless
 pytz
 pillow~=12.1.0
 psutil
-py-tgcalls
+py-tgcalls==0.9.7
 pykeyboard
 python-dotenv
 pyyaml
