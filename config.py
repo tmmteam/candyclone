@@ -19,8 +19,6 @@ BOT_LINK = getenv("BOT_LINK", "https://t.me/MusicStream_roBot?start=_tgr_gb45Zpc
 
 MONGO_DB_URI = getenv("MONGO_DB_URI")
 
-API_URL= "https://apisparrow.site"
-API_KEY= "sparrowALHk32sQQ0fGcTLymiTUwunR"
 DURATION_LIMIT_MIN = int(getenv("DURATION_LIMIT", 17000))
 
 LOGGER_ID = int(getenv("LOGGER_ID", "0"))
