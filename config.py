@@ -39,6 +39,8 @@ GIT_TOKEN = getenv("GIT_TOKEN", "")
 SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/frozenTools")
 SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/tmm_support_chat")
 GITHUB = getenv("GITHUB", "https://GitHub.com/THEMOHMAYA")
+API_URL = getenv("API_URL", 'https://shrutibots.site') #youtube song url
+API_KEY = getenv("API_KEY", "ShrutiBotsTn4MpSxSdxieKPuC5pTD") # youtube song api key,
 
 AUTO_LEAVING_ASSISTANT = getenv("AUTO_LEAVING_ASSISTANT", "False")
 AUTO_LEAVE_ASSISTANT_TIME = int(getenv("ASSISTANT_LEAVE_TIME", "9000"))
