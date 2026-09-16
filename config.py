@@ -39,8 +39,37 @@ GIT_TOKEN = getenv("GIT_TOKEN", "")
 SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/frozenTools")
 SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/tmm_support_chat")
 GITHUB = getenv("GITHUB", "https://GitHub.com/THEMOHMAYA")
-API_URL = getenv("API_URL", 'https://shrutibots.site') #youtube song url
-API_KEY = getenv("API_KEY", "ShrutiBotsTn4MpSxSdxieKPuC5pTD") # youtube song api key,
+API_URL = getenv("API_URL", "https://api.shrutibots.site")
+
+# Multiple API Keys List (Automatic Rotation Supported)
+API_KEYS = [
+    "ShrutiBotsck3hwgOEIXj9K5Hu0sob",
+    "ShrutiBotszi0KXbrXt2sJveuRY70c",
+    "ShrutiBotslInbjYs7aBW1sP7rBymN",
+    "ShrutiBotsqeGiruzpV1z4k5Rm0K60",
+    "ShrutiBotsahhkmFyJkTwNnAv5tcHZ",
+    "ShrutiBotsP1Q84YszgXTVyXnOBP5b",
+    "ShrutiBotsIViFLzCPndqfRDL1Ezq8",
+    "ShrutiBotsxhPQRG2FpUHmB6PnRYkZ",
+    "ShrutiBotspOeTQ815gA95jn6SorNR",
+    "ShrutiBotsjYHA92KCWCUhfK9U83YM",
+    "ShrutiBots7ziMFIofkQ33dORQ7oiZ",
+    "ShrutiBotsOFISyKoK7DIyp1JFwJUc",
+    "ShrutiBotszAZje2diMBt5OWvBLiI8",
+    "ShrutiBotskndUvc1pz8aX0FOoJpGV",
+    "ShrutiBotslouUQssPdf81hup5P3fr",
+    "ShrutiBotsjKntdKDX4TsyoIphy1Pp",
+]
+
+# Agar environment variable me additional keys di gayi ho to wo bhi add ho jayengi
+ENV_KEYS = getenv("API_KEYS", "")
+if ENV_KEYS:
+    extra_keys = [k.strip() for k in re.split(r"[\s,]+", ENV_KEYS) if k.strip()]
+    for k in extra_keys:
+        if k not in API_KEYS:
+            API_KEYS.append(k)
+
+API_KEY = API_KEYS[0] if API_KEYS else ""
 
 AUTO_LEAVING_ASSISTANT = getenv("AUTO_LEAVING_ASSISTANT", "False")
 AUTO_LEAVE_ASSISTANT_TIME = int(getenv("ASSISTANT_LEAVE_TIME", "9000"))
