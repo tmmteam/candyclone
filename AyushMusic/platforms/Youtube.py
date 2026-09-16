@@ -8,11 +8,37 @@ from pyrogram.types import Message
 from py_yt import VideosSearch, Playlist
 import aiohttp
 
-API_URL = os.environ.get("SHRUTI_API_URL", "https://api.shrutibots.site")
-
-API_KEY = os.environ.get("SHRUTI_API_KEY", "ShrutiBotsTn4MpSxSdxieKPuC5pTD") ## Get This API KEY FROM TELEGRAM BOT USERNAME: @SHRUTIAPIBOT 
+# Config se API_URL aur API_KEYS import karein (with fallback)
+try:
+    from config import API_URL, API_KEYS, API_KEY
+except ImportError:
+    API_URL = os.environ.get("SHRUTI_API_URL", os.environ.get("API_URL", "https://api.shrutibots.site"))
+    raw_keys = os.environ.get("API_KEYS", os.environ.get("SHRUTI_API_KEY", os.environ.get("API_KEY", "ShrutiBotsTn4MpSxSdxieKPuC5pTD")))
+    API_KEYS = [k.strip() for k in re.split(r"[\s,]+", raw_keys) if k.strip()] if isinstance(raw_keys, str) else []
+    API_KEY = API_KEYS[0] if API_KEYS else ""
 
 DOWNLOAD_DIR = "downloads"
+
+# Current active key index
+CURRENT_KEY_INDEX = 0
+
+def get_current_api_key() -> str:
+    """Active API key return karta hai"""
+    global CURRENT_KEY_INDEX
+    if not API_KEYS:
+        return ""
+    return API_KEYS[CURRENT_KEY_INDEX % len(API_KEYS)]
+
+def rotate_api_key(failed_key: str = None) -> str:
+    """Agar koi key fail/exhaust ho jaye to agle key par switch karta hai"""
+    global CURRENT_KEY_INDEX
+    if not API_KEYS:
+        return ""
+    # Sirf tab switch karega jab failed_key match kare ya None ho
+    if failed_key is None or API_KEYS[CURRENT_KEY_INDEX % len(API_KEYS)] == failed_key:
+        CURRENT_KEY_INDEX = (CURRENT_KEY_INDEX + 1) % len(API_KEYS)
+        print(f"[API ROTATION] Limit reached or error. Switched to API Key index {CURRENT_KEY_INDEX + 1}/{len(API_KEYS)}")
+    return API_KEYS[CURRENT_KEY_INDEX % len(API_KEYS)]
 
 
 def time_to_seconds(time):
@@ -30,28 +56,39 @@ async def download_song(link: str) -> str:
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
 
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"{API_URL}/download",
-                params={"url": video_id, "type": "audio", "api_key": API_KEY},
-                timeout=aiohttp.ClientTimeout(total=300)
-            ) as resp:
-                if resp.status != 200:
-                    return None
-                with open(file_path, "wb") as f:
-                    async for chunk in resp.content.iter_chunked(131072):
-                        f.write(chunk)
-        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-            return file_path
+    if not API_KEYS:
         return None
-    except Exception:
+
+    # Saari keys me baari-baari try karega agar limit khatam ho jaye
+    total_keys = len(API_KEYS)
+    for _ in range(total_keys):
+        key = get_current_api_key()
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    f"{API_URL}/download",
+                    params={"url": video_id, "type": "audio", "api_key": key},
+                    timeout=aiohttp.ClientTimeout(total=300)
+                ) as resp:
+                    if resp.status == 200:
+                        with open(file_path, "wb") as f:
+                            async for chunk in resp.content.iter_chunked(131072):
+                                f.write(chunk)
+                        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+                            return file_path
+                    
+                    # 100 request quota khatam hone par status != 200 aayega -> Next Key
+                    rotate_api_key(failed_key=key)
+        except Exception:
+            rotate_api_key(failed_key=key)
+
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)
             except Exception:
                 pass
-        return None
+
+    return None
 
 
 async def download_video(link: str) -> str:
@@ -64,28 +101,37 @@ async def download_video(link: str) -> str:
     if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
         return file_path
 
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                f"{API_URL}/download",
-                params={"url": video_id, "type": "video", "api_key": API_KEY},
-                timeout=aiohttp.ClientTimeout(total=600)
-            ) as resp:
-                if resp.status != 200:
-                    return None
-                with open(file_path, "wb") as f:
-                    async for chunk in resp.content.iter_chunked(131072):
-                        f.write(chunk)
-        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
-            return file_path
+    if not API_KEYS:
         return None
-    except Exception:
+
+    total_keys = len(API_KEYS)
+    for _ in range(total_keys):
+        key = get_current_api_key()
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    f"{API_URL}/download",
+                    params={"url": video_id, "type": "video", "api_key": key},
+                    timeout=aiohttp.ClientTimeout(total=600)
+                ) as resp:
+                    if resp.status == 200:
+                        with open(file_path, "wb") as f:
+                            async for chunk in resp.content.iter_chunked(131072):
+                                f.write(chunk)
+                        if os.path.exists(file_path) and os.path.getsize(file_path) > 0:
+                            return file_path
+
+                    rotate_api_key(failed_key=key)
+        except Exception:
+            rotate_api_key(failed_key=key)
+
         if os.path.exists(file_path):
             try:
                 os.remove(file_path)
             except Exception:
                 pass
-        return None
+
+    return None
 
 
 class YouTubeAPI:
