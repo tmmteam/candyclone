@@ -39,7 +39,7 @@ GIT_TOKEN = getenv("GIT_TOKEN", "")
 SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/frozenTools")
 SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/tmm_support_chat")
 GITHUB = getenv("GITHUB", "https://GitHub.com/THEMOHMAYA")
-API_URL = getenv("API_URL", "https://api.shrutibots.site")
+API_URL = getenv("API_URL", "https://api.shrutibots.in")
 
 # Multiple API Keys List (Automatic Rotation Supported)
 API_KEYS = [
