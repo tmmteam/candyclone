@@ -12,7 +12,7 @@ import aiohttp
 try:
     from config import API_URL, API_KEYS, API_KEY
 except ImportError:
-    API_URL = os.environ.get("SHRUTI_API_URL", os.environ.get("API_URL", "https://api.shrutibots.site"))
+    API_URL = os.environ.get("SHRUTI_API_URL", os.environ.get("API_URL", "https://api.shrutibots.in"))
     raw_keys = os.environ.get("API_KEYS", os.environ.get("SHRUTI_API_KEY", os.environ.get("API_KEY", "ShrutiBotsq4QjEp49lG6lvOxU1N4u")))
     API_KEYS = [k.strip() for k in re.split(r"[\s,]+", raw_keys) if k.strip()] if isinstance(raw_keys, str) else []
     API_KEY = API_KEYS[0] if API_KEYS else ""
