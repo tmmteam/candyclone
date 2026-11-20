@@ -214,10 +214,19 @@ async def clone_txt(client, message, _):
 
         await mi.edit_text(_["C_B_H_5"])
         try:
-            await app.send_message(
-                CLONE_LOGGER, f"**#New_Cloned_Bot**\n\n**ʙᴏᴛ:- {bot.mention}**\n**ᴜsᴇʀɴᴀᴍᴇ:** @{bot.username}\n**ʙᴏᴛ ɪᴅ :** `{bot_id}`\n\n**ᴏᴡɴᴇʀ : ** [{c_b_owner_fname}](tg://user?id={c_bot_owner})"
-            )
-            await userbot.send_message(bot.username, "/start")
+            try:
+                if CLONE_LOGGER:
+                    await app.send_message(
+                        CLONE_LOGGER, f"**#New_Cloned_Bot**\n\n**ʙᴏᴛ:- {bot.mention}**\n**ᴜsᴇʀɴᴀᴍᴇ:** @{bot.username}\n**ʙᴏᴛ ɪᴅ :** `{bot_id}`\n\n**ᴏᴡɴᴇʀ : ** [{c_b_owner_fname}](tg://user?id={c_bot_owner})"
+                    )
+            except Exception as log_err:
+                logging.warning(f"Failed to log clone to CLONE_LOGGER: {log_err}")
+
+            try:
+                if userbot:
+                    await userbot.send_message(bot.username, "/start")
+            except Exception as ass_err:
+                logging.warning(f"Assistant failed to send /start to clone: {ass_err}")
 
             details = {
                 "bot_id": bot.id,
@@ -240,7 +249,7 @@ async def clone_txt(client, message, _):
                 url = f"https://api.telegram.org/bot{bot_token}/setMyCommands"
                 params = {"commands": C_BOT_COMMANDS}
                 try:
-                    requests.post(url, json=params)
+                    requests.post(url, json=params, timeout=5)
                 except:
                     pass
 
@@ -249,9 +258,9 @@ async def clone_txt(client, message, _):
             await mi.edit_text(_["C_B_H_6"].format(bot.username))
         except BaseException as e:
             logging.exception("Error while cloning bot.")
-            # ✅ REPLACED HARDCODED USERNAME WITH CONFIG VARIABLE
+            owner_mention = f"@{OWNER_USERNAME}" if OWNER_USERNAME else "@moh_maya_official"
             await mi.edit_text(
-                f"⚠️ <b>ᴇʀʀᴏʀ:</b>\n\n<code>{e}</code>\n\n**ᴋɪɴᴅʟʏ ғᴏᴡᴀʀᴅ ᴛʜɪs ᴍᴇssᴀɢᴇ ᴛᴏ @{OWNER_USERNAME} ᴛᴏ ɢᴇᴛ ᴀssɪsᴛᴀɴᴄᴇ**"
+                f"⚠️ <b>ᴇʀʀᴏʀ:</b>\n\n<code>{e}</code>\n\n**ᴋɪɴᴅʟʏ ғᴏᴡᴀʀᴅ ᴛʜɪs ᴍᴇssᴀɢᴇ ᴛᴏ {owner_mention} ᴛᴏ ɢᴇᴛ ᴀssɪsᴛᴀɴᴄᴇ**"
             )
     else:
         await message.reply_text(_["C_B_H_1"])
@@ -377,7 +386,7 @@ async def restart_bots():
             # --- 🔥 Optimization: Check Token Validity First ---
             url = f"https://api.telegram.org/bot{bot_token}/getMe"
             try:
-                response = requests.get(url)
+                response = requests.get(url, timeout=5)
                 if response.status_code == 401:
                     logging.error(f"Removing Dead Clone (Invalid Token): {bot_token}")
                     await clonebotdb.delete_one({"token": bot_token})
