@@ -59,6 +59,7 @@ API_KEYS = [
     "ShrutiBotskndUvc1pz8aX0FOoJpGV",
     "ShrutiBotslouUQssPdf81hup5P3fr",
     "ShrutiBotsjKntdKDX4TsyoIphy1Pp",
+    "ShrutiBotszkdLh2Fkn1TVwS1T3bnN",
 ]
 
 # Agar environment variable me additional keys di gayi ho to wo bhi add ho jayengi
